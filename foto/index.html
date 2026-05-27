@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mijn Foto App - Image Editor</title>
+    <!-- Zorg dat het pa
+     d naar je CSS bestand klopt -->
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- LINKERKANT: Bestand kiezen & Acties -->
+      <aside class="controls-left">
+        <h1>Mijn Foto App</h1>
+
+        <div class="input-group">
+          <label>Nieuwe Foto</label>
+          <!-- Deze input is onzichtbaar, maar wordt geactiveerd door de knop eronder -->
+          <input
+            type="file"
+            id="file-input"
+            accept="image/*"
+            style="display: none"
+          />
+          <button id="upload-trigger" class="upload-btn">
+            📂 Kies van laptop
+          </button>
+        </div>
+
+        <div style="margin: 20px 0; border-top: 1px solid #7dd3fc"></div>
+
+        <!-- De downloadknop die de bewerkte versie opslaat -->
+        <button id="download-btn" class="download-btn">
+          📥 Download Bewerkt
+        </button>
+      </aside>
+
+      <!-- MIDDEN: De Foto Preview -->
+      <section id="foto-container" class="foto-sectie">
+        <div class="placeholder-text">
+          <p>Klik op "Kies van laptop" om een foto te bewerken...</p>
+        </div>
+      </section>
+
+      <!-- RECHTERKANT: Filters -->
+      <aside class="controls-right">
+        <h2>Filters</h2>
+        <!-- De data-filter waarden worden door FotoManager.js gebruikt -->
+        <button class="filter-btn" data-filter="f-grayscale">Zwart-wit</button>
+        <button class="filter-btn" data-filter="f-sepia">Sepia</button>
+        <button class="filter-btn" data-filter="f-invert">Invert</button>
+        <button class="filter-btn filter-active" data-filter="">Geen</button>
+
+        <p class="helper-text">
+          Kies een filter en klik daarna op downloaden om de bewerkte foto op te
+          slaan.
+        </p>
+      </aside>
+    </div>
+
+    <!-- Hoofd JavaScript bestand -->
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

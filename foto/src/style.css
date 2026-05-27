@@ -1,0 +1,155 @@
+:root {
+  --baby-blue: #e0f2fe;
+  --primary-blue: #7dd3fc;
+  --dark-blue: #0369a1;
+  --white: #ffffff;
+}
+
+/* BASIS STYLING (Voor iedereen & Mobiel) */
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, var(--baby-blue) 0%, #f0f9ff 100%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Veranderd van center naar start voor scrollen op mobiel */
+  min-height: 100vh;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+#app {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  width: 100%; /* Volledige breedte op mobiel */
+  max-width: 1100px; /* Maximale breedte op grote schermen */
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column; /* Alles onder elkaar op mobiel */
+  gap: 20px;
+  padding: 20px;
+  border: 1px solid var(--white);
+  box-sizing: border-box;
+}
+
+/* Kolommen - Op mobiel gewoon een lijst */
+.controls-left,
+.controls-right {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.foto-sectie {
+  background: var(--white);
+  border-radius: 20px;
+  border: 2px dashed var(--primary-blue);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  min-height: 300px;
+  justify-content: center;
+  align-items: center;
+  order: 2; /* De foto komt op mobiel tussen de upload en filters in */
+}
+
+/* Elementen */
+h1,
+h2 {
+  color: var(--dark-blue);
+  font-size: 1.2rem;
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+
+button {
+  padding: 14px; /* Iets groter voor makkelijker tikken op mobiel */
+  border-radius: 12px;
+  border: none;
+  background: var(--primary-blue);
+  color: var(--dark-blue);
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 100%; /* Knoppen vullen de breedte op mobiel */
+}
+
+button:hover {
+  background: var(--dark-blue);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* De Foto Kaartjes */
+.foto-card {
+  background: var(--white);
+  padding: 15px;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 450px;
+  transition: transform 0.3s ease;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+.foto-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* Filter effecten */
+.f-grayscale {
+  filter: grayscale(100%);
+}
+.f-sepia {
+  filter: sepia(100%);
+}
+.f-invert {
+  filter: invert(100%);
+}
+
+.filter-btn {
+  background: var(--white);
+  border: 1px solid var(--primary-blue);
+}
+
+.filter-active {
+  background: var(--dark-blue);
+  color: white;
+}
+
+/* -------------------------------------------------- */
+/* MEDIA QUERY: LAPTOPS & GROTE SCHERMEN (Vanaf 768px) */
+/* -------------------------------------------------- */
+@media (min-width: 768px) {
+  body {
+    align-items: center; /* Op laptop weer in het midden van het scherm */
+  }
+
+  #app {
+    display: grid;
+    grid-template-columns: 220px 1fr 200px; /* Terug naar de 3 kolommen */
+    height: 700px; /* Vaste hoogte voor de editor-look */
+    padding: 30px;
+  }
+
+  .foto-sectie {
+    order: unset; /* Terug naar de grid volgorde */
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  h1,
+  h2 {
+    text-align: left;
+  }
+
+  button {
+    width: auto; /* Knoppen worden weer zo breed als hun tekst */
+  }
+}
