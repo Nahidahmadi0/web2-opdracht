@@ -20,9 +20,9 @@ manager.subscribe((fotos) => {
 });
 
 // Haal de HTML elementen op die we nodig hebben voor events
-const fileInput = document.getElementById("file-input");       // het verborgen bestandskiezer inputveld
+const fileInput = document.getElementById("file-input"); // het verborgen bestandskiezer inputveld
 const uploadTrigger = document.getElementById("upload-trigger"); // de zichtbare uploadknop
-const downloadBtn = document.getElementById("download-btn");     // de downloadknop
+const downloadBtn = document.getElementById("download-btn"); // de downloadknop
 
 // ─── App opstarten ─────────────────────────────────────────────────────────────
 
@@ -131,8 +131,8 @@ if (downloadBtn) {
 
     // Maak een download link aan en klik er automatisch op
     const link = document.createElement("a");
-    link.download = "foto.png";       // de bestandsnaam bij download
-    link.href = canvas.toDataURL();   // zet de canvas om naar een downloadbare URL
-    link.click();                     // start de download
+    link.download = "foto.png"; // de bestandsnaam bij download
+    link.href = canvas.toDataURL(); // zet de canvas om naar een downloadbare URL
+    link.click(); // start de download
   });
 }
