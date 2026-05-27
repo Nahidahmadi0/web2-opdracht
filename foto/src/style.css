@@ -1,3 +1,5 @@
+/* CSS variabelen zodat we kleuren maar één keer hoeven te definiëren */
+/* Als we een kleur willen aanpassen, doen we dat hier en verandert het overal */
 :root {
   --baby-blue: #e0f2fe;
   --primary-blue: #7dd3fc;
@@ -5,35 +7,45 @@
   --white: #ffffff;
 }
 
-/* BASIS STYLING (Voor iedereen & Mobiel) */
+/* ─── BASIS STYLING (Mobiel eerst) ────────────────────────────────────────────── */
+
+/* margin: 0 verwijdert de standaard witruimte die de browser automatisch toevoegt */
+/* linear-gradient maakt een kleurovergang van baby-blue naar lichtblauw als achtergrond */
+/* display flex + justify/align-items centreert de inhoud op de pagina */
+/* min-height: 100vh zorgt dat de body altijd minstens de volledige schermhoogte vult */
 body {
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, var(--baby-blue) 0%, #f0f9ff 100%);
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* Veranderd van center naar start voor scrollen op mobiel */
+  align-items: flex-start; /* flex-start zodat de inhoud bovenaan begint en je kunt scrollen op mobiel */
   min-height: 100vh;
   padding: 10px;
-  box-sizing: border-box;
+  box-sizing: border-box; /* padding wordt meegerekend in de breedte zodat er geen overflow is */
 }
 
+/* rgba(255,255,255,0.7) is wit met 70% doorzichtigheid voor het glazen effect */
+/* backdrop-filter: blur maakt de achtergrond achter het element wazig (frosted glass) */
+/* max-width: 1100px zodat het element niet te breed wordt op grote schermen */
+/* flex-direction: column zet alles onder elkaar op mobiel */
 #app {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
-  width: 100%; /* Volledige breedte op mobiel */
-  max-width: 1100px; /* Maximale breedte op grote schermen */
+  width: 100%;
+  max-width: 1100px;
   border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* subtiele schaduw voor diepte-effect */
   display: flex;
-  flex-direction: column; /* Alles onder elkaar op mobiel */
-  gap: 20px;
+  flex-direction: column;
+  gap: 20px; /* ruimte tussen de kinderen van dit element */
   padding: 20px;
   border: 1px solid var(--white);
   box-sizing: border-box;
 }
 
-/* Kolommen - Op mobiel gewoon een lijst */
+/* op mobiel zijn de linker- en rechterkolom gewoon blokken onder elkaar */
+/* width: 100% zodat ze de volledige breedte vullen */
 .controls-left,
 .controls-right {
   display: flex;
@@ -42,6 +54,10 @@ body {
   width: 100%;
 }
 
+/* de sectie waar de foto getoond wordt */
+/* border: 2px dashed geeft de stippelrand die aangeeft dat je hier iets kunt uploaden */
+/* justify-content + align-items: center centreert de foto in de sectie */
+/* order: 2 schuift de foto-sectie naar het midden op mobiel (tussen upload en filters) */
 .foto-sectie {
   background: var(--white);
   border-radius: 20px;
@@ -53,10 +69,13 @@ body {
   min-height: 300px;
   justify-content: center;
   align-items: center;
-  order: 2; /* De foto komt op mobiel tussen de upload en filters in */
+  order: 2;
 }
 
-/* Elementen */
+/* ─── Elementen ────────────────────────────────────────────────────────────────── */
+
+/* font-size: 1.2rem is relatief aan de standaard tekstgrootte van de browser */
+/* margin: 0 0 10px 0 is shorthand voor: boven rechts onder links */
 h1,
 h2 {
   color: var(--dark-blue);
@@ -65,25 +84,34 @@ h2 {
   text-align: center;
 }
 
+/* padding: 14px iets groter dan normaal zodat de knop makkelijker te tikken is op mobiel */
+/* transition: 0.3s zorgt voor een vloeiende animatie bij hover */
+/* width: 100% zodat de knop de volledige breedte vult op mobiel */
 button {
-  padding: 14px; /* Iets groter voor makkelijker tikken op mobiel */
+  padding: 14px;
   border-radius: 12px;
   border: none;
   background: var(--primary-blue);
   color: var(--dark-blue);
   font-weight: bold;
-  cursor: pointer;
+  cursor: pointer; /* cursor verandert naar een handje als je erover zweeft */
   transition: 0.3s;
-  width: 100%; /* Knoppen vullen de breedte op mobiel */
+  width: 100%;
 }
 
+/* hover verandert de kleur en beweegt de knop 2px omhoog voor een klik-effect */
+/* transform: translateY(-2px) beweegt het element 2 pixels omhoog */
 button:hover {
   background: var(--dark-blue);
   color: white;
   transform: translateY(-2px);
 }
 
-/* De Foto Kaartjes */
+/* ─── Foto kaartjes ────────────────────────────────────────────────────────────── */
+
+/* max-width: 450px zodat de foto niet te groot wordt */
+/* transition: transform zorgt voor een vloeiende animatie als de kaart beweegt */
+/* box-shadow geeft een lichte schaduw aan de onderkant voor een zweef-effect */
 .foto-card {
   background: var(--white);
   padding: 15px;
@@ -96,60 +124,82 @@ button:hover {
   box-sizing: border-box;
 }
 
+/* width: 100% zodat de foto de volledige breedte van de kaart vult */
+/* height: auto bewaart de verhouding van de foto zodat hij niet uitgerekt wordt */
 .foto-card img {
   width: 100%;
   height: auto;
   border-radius: 10px;
 }
 
-/* Filter effecten */
+/* ─── CSS Filters ──────────────────────────────────────────────────────────────── */
+
+/* filter: grayscale(100%) maakt de afbeelding volledig zwart-wit */
+/* deze klasse wordt via JavaScript toegevoegd aan de img wanneer de gebruiker de knop klikt */
 .f-grayscale {
   filter: grayscale(100%);
 }
+
+/* filter: sepia(100%) geeft de afbeelding een bruinachtige vintage look */
 .f-sepia {
   filter: sepia(100%);
 }
+
+/* filter: invert(100%) keert alle kleuren om (zwart wordt wit, etc.) */
 .f-invert {
   filter: invert(100%);
 }
 
+/* filterknoppen hebben een witte achtergrond met een blauwe rand */
+/* ze zien er anders uit dan de gewone knoppen zodat de gebruiker het verschil ziet */
 .filter-btn {
   background: var(--white);
   border: 1px solid var(--primary-blue);
 }
 
+/* filter-active wordt via JavaScript toegevoegd aan de actieve filterknop */
+/* donkere achtergrond zodat duidelijk is welk filter momenteel actief is */
 .filter-active {
   background: var(--dark-blue);
   color: white;
 }
 
-/* -------------------------------------------------- */
-/* MEDIA QUERY: LAPTOPS & GROTE SCHERMEN (Vanaf 768px) */
-/* -------------------------------------------------- */
+/* ─── Media Query: Laptop & grote schermen (vanaf 768px) ──────────────────────── */
+
+/* @media (min-width: 768px) betekent: pas deze CSS toe als het scherm breder is dan 768px */
+/* alles hierboven is voor mobiel, alles hieronder overschrijft dat voor grotere schermen */
 @media (min-width: 768px) {
+  /* op laptop centreert de body de inhoud verticaal in het midden van het scherm */
   body {
-    align-items: center; /* Op laptop weer in het midden van het scherm */
+    align-items: center;
   }
 
+  /* display: grid vervangt flex zodat we 3 kolommen naast elkaar kunnen zetten */
+  /* grid-template-columns definieert de breedte van elke kolom: links, midden, rechts */
+  /* height: 700px geeft de app een vaste hoogte zodat het eruitziet als een editor */
   #app {
     display: grid;
-    grid-template-columns: 220px 1fr 200px; /* Terug naar de 3 kolommen */
-    height: 700px; /* Vaste hoogte voor de editor-look */
+    grid-template-columns: 220px 1fr 200px;
+    height: 700px;
     padding: 30px;
   }
 
+  /* order: unset zet de foto-sectie terug op zijn normale grid positie */
+  /* overflow-y: auto voegt een scrollbar toe als er te veel foto's zijn */
   .foto-sectie {
-    order: unset; /* Terug naar de grid volgorde */
+    order: unset;
     height: 100%;
     overflow-y: auto;
   }
 
+  /* op laptop uitlijnen naar links in plaats van gecentreerd */
   h1,
   h2 {
     text-align: left;
   }
 
+  /* op laptop zijn de knoppen niet meer full-width maar zo breed als hun tekst */
   button {
-    width: auto; /* Knoppen worden weer zo breed als hun tekst */
+    width: auto;
   }
 }
