@@ -8,26 +8,15 @@ export class Api {
     this.baseUrl = "http://localhost:3000/api";
   }
 
-  // Methode om alle foto's op te halen van de server (GET)
   async getFotos() {
     try {
-      // fetch stuurt een GET request naar de backend
       const response = await fetch(`${this.baseUrl}/fotos`);
-      const data = await response.json(); // zet het antwoord om naar een JS object/array
-
-      // Sla de opgehaalde foto's ook op in localStorage als backup
-      // JSON.stringify zet een array om naar tekst zodat localStorage het kan bewaren
+      const data = await response.json();
       localStorage.setItem("fotos", JSON.stringify(data));
-
-      return data; // geef de foto's terug aan main.js
+      return data;
     } catch (error) {
-      // Als de server offline is, valt de fetch in de fout
-      // Dan gebruiken we localStorage als fallback (bonuspunt!)
       console.log("API offline -> localStorage gebruikt");
-
-      const opgeslagen = localStorage.getItem("fotos"); // haal de opgeslagen tekst op
-
-      // Als er iets in localStorage staat: parse het terug naar een array, anders lege array
+      const opgeslagen = localStorage.getItem("fotos");
       return opgeslagen ? JSON.parse(opgeslagen) : [];
     }
   }
