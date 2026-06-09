@@ -1,84 +1,134 @@
-// api.js is verantwoordelijk voor alle communicatie met de backend
-// Door dit in een aparte module te zetten, hoeven we fetch-logica niet te herhalen in main.js
-// Als we later iets willen aanpassen aan de communicatie, doen we dat op één plaats
+// ════════════════════════════════════════════════════════════════════════════
+// api.js — Communicatie met de backend
+//
+// Dit bestand bevat ALLE code om te praten met de server (server.js).
+// Door dit apart te zetten (modulair), hoeven we fetch-code niet te
+// herhalen telkens in main.js. Dit maakt de code overzichtelijker.
+// ════════════════════════════════════════════════════════════════════════════
 
 export class Api {
+  // "export" = deze klasse mag gebruikt worden in andere bestanden (bv. main.js)
+  // "class Api" = een klasse met de naam Api
+
   constructor() {
-    // Het basisadres van onze Express server
-    // Alle endpoints beginnen met dit adres
-    // this.baseUrl sla ik op zodat ik het adres overal in de klasse kan gebruiken zonder het elke keer opnieuw te typen
-    // De constructor wordt automatisch uitgevoerd als je new Api() schrijft
+    // constructor() wordt automatisch uitgevoerd als je "new Api()" schrijft
+    // Hier stel je de begintoestand van het object in
+
     this.baseUrl = "http://localhost:3000/api";
+    // this.baseUrl = het basisadres van onze Express server
+    // Alle API endpoints beginnen met dit adres
+    // Voorbeeld: http://localhost:3000/api/fotos
   }
 
-  // Methode om alle foto's op te halen van de server (GET)
-  // async betekent dat de functie moet wachten op de server zonder de rest van de pagina te blokkeren
+  // ─── GET: alle foto's ophalen ──────────────────────────────────────────
+
   async getFotos() {
-    // try gebruiken we om fouten op te vangen
-    // als de fetch mislukt omdat de server offline is, valt de code in het catch blok
+    // "async" = deze methode doet iets dat tijd nodig heeft (wachten op server)
+    // We moeten "await" kunnen gebruiken in een async functie
+
     try {
-      // fetch stuurt een GET request naar de backend
-      // await betekent: wacht hier tot de server antwoordt
+      // "try" = probeer de code hieronder uit te voeren
+      // Als er iets misgaat (server offline), gaan we naar "catch"
+
       const response = await fetch(`${this.baseUrl}/fotos`);
+      // fetch() stuurt een GET request naar de server
+      // `${this.baseUrl}/fotos` = "http://localhost:3000/api/fotos"
+      // "await" = wacht tot de server een antwoord stuurt
+      // response = het antwoord van de server (nog niet als JS data)
 
-      // zet het antwoord om naar een JavaScript array
       const data = await response.json();
+      // .json() zet het antwoord om van tekst naar een JavaScript array
+      // "await" = wachten tot dit omzetten klaar is
+      // data = een array van foto-objecten: [{naam: "...", url: "..."}, ...]
 
-      // Sla de opgehaalde foto's ook op in localStorage als backup
-      // JSON.stringify zet een array om naar tekst zodat localStorage het kan bewaren
-      // localStorage is zoals een notitieboekje: als de server crasht heb je altijd nog je backup
       localStorage.setItem("fotos", JSON.stringify(data));
+      // localStorage is een opslagplaats in de browser die blijft bestaan
+      // .setItem(key, value) slaat een waarde op
+      // JSON.stringify(data) = zet de array om naar tekst (localStorage bewaart alleen tekst)
+      // Dit dient als BACKUP: als de server later offline is, hebben we nog data
 
-      return data; // geef de foto's terug aan main.js
+      return data;
+      // Geef de foto's terug aan wie deze methode aanriep (= main.js)
     } catch (error) {
-      // Als de server offline is, valt de fetch in de fout en komen we hier
-      // Dan gebruiken we localStorage als fallback (plan B)
+      // "catch" wordt uitgevoerd ALS de fetch mislukt (server offline, netwerkfout...)
+      // "error" bevat informatie over wat er misging
+
       console.log("API offline -> localStorage gebruikt");
+      // Toon een boodschap in de browser-console (F12 > Console)
+      // Dit is handig voor debugging
 
-      // haal de opgeslagen tekst op uit localStorage
       const opgeslagen = localStorage.getItem("fotos");
+      // Probeer de eerder opgeslagen foto's op te halen uit localStorage
+      // Als er niets opgeslagen is, geeft dit null terug
 
-      // Als er iets in localStorage staat: parse het terug naar een array
-      // Anders geven we een lege array terug zodat de app niet crasht
       return opgeslagen ? JSON.parse(opgeslagen) : [];
+      // Ternaire operator: als "opgeslagen" iets bevat → parse het terug naar array
+      //                    als "opgeslagen" leeg is (null) → geef lege array terug
+      // JSON.parse() is het omgekeerde van JSON.stringify(): tekst → JS array
     }
   }
 
-  // Methode om een nieuwe foto te sturen naar de server (POST)
-  // async zodat we kunnen wachten op het antwoord van de server
+  // ─── POST: een nieuwe foto uploaden ───────────────────────────────────
+
   async postFoto(foto) {
+    // "foto" = het foto-object dat we naar de server sturen
+    // Bevat: { naam: "bestandsnaam.jpg", url: "data:image/...base64..." }
+
     try {
-      // fetch met method POST stuurt data naar de backend
+      // Probeer de foto te sturen naar de server
+
       const response = await fetch(`${this.baseUrl}/fotos`, {
+        // fetch() met extra opties = POST request (standaard is het GET)
+
         method: "POST",
+        // Stel in dat we een POST request sturen (data STUREN naar server)
+        // GET = data ophalen, POST = data sturen
+
         headers: {
-          "Content-Type": "application/json", // we sturen JSON data
+          "Content-Type": "application/json",
+          // Vertel de server dat we JSON data sturen
+          // Zonder dit begrijpt de server het body formaat niet
         },
-        // JSON.stringify zet het foto-object om naar tekst
-        // fetch kan geen JavaScript object rechtstreeks versturen over het internet
-        // daarom zetten we het eerst om naar tekst zodat de server het kan ontvangen
+
         body: JSON.stringify(foto),
+        // JSON.stringify(foto) = zet het foto-object om naar JSON tekst
+        // Voorbeeld: '{"naam":"test.jpg","url":"data:image/jpeg;base64,..."}'
+        // body = de inhoud van ons verzoek (wat we sturen)
       });
 
-      const data = await response.json(); // het antwoord van de server
+      const data = await response.json();
+      // Lees het antwoord van de server (de opgeslagen foto terug)
+      // De server stuurt in server.js: res.status(201).json(nieuweFoto)
 
-      // Als de server werkt: foto gaat naar de server EN wordt ook lokaal opgeslagen
-      // zodat de localStorage fallback altijd up-to-date blijft
       const lokaal = JSON.parse(localStorage.getItem("fotos") || "[]");
+      // Haal de lokale backup op uit localStorage
+      // "|| '[]'" = als er niets staat, gebruik een lege array als tekst
+
       lokaal.push(data);
+      // Voeg de nieuwe foto ook toe aan de lokale backup
+
       localStorage.setItem("fotos", JSON.stringify(lokaal));
+      // Sla de bijgewerkte backup op in localStorage
 
       return data;
+      // Geef de opgeslagen foto terug aan main.js
     } catch (error) {
-      // Als de server offline is: foto kan niet naar de server
-      // Dan slaan we de foto alleen lokaal op zodat je hem toch nog ziet
+      // Als de server offline is, slaan we de foto ALLEEN lokaal op
+
       console.log("Offline -> lokaal opgeslagen");
+      // Melding in de console
 
       const lokaal = JSON.parse(localStorage.getItem("fotos") || "[]");
+      // Haal huidige lokale lijst op
+
       lokaal.push(foto);
+      // Voeg de nieuwe foto toe aan de lokale lijst
+
       localStorage.setItem("fotos", JSON.stringify(lokaal));
+      // Sla de bijgewerkte lijst op
 
       return foto;
+      // Geef het foto-object terug zodat main.js verder kan werken
     }
   }
 }

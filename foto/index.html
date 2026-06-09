@@ -1,77 +1,123 @@
 <!doctype html>
-<!-- lang="nl" vertelt de browser dat de pagina in het Nederlands is -->
+<!-- Dit vertelt de browser dat dit een HTML5 document is -->
+
 <html lang="nl">
+  <!-- <html> is het hoofdelement van de pagina, lang="nl" = taal is Nederlands -->
+
   <head>
-    <!-- charset="UTF-8" zorgt dat speciale tekens zoals é correct worden weergegeven -->
+    <!-- <head> bevat informatie OVER de pagina, maar toont niets op het scherm -->
+
     <meta charset="UTF-8" />
-    <!-- viewport zorgt dat de pagina correct schaalt op mobiele schermen -->
+    <!-- Zorgt dat speciale tekens (é, ë, ç...) correct getoond worden -->
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Zorgt dat de pagina goed schaalbaar is op mobiele schermen -->
+
     <title>Mijn Foto App - Image Editor</title>
-    <!-- link koppelt ons CSS bestand aan deze pagina voor de styling -->
+    <!-- De tekst die je ziet in het tabblad van de browser -->
+
     <link rel="stylesheet" href="./src/style.css" />
+    <!-- Koppelt ons CSS bestand aan de pagina zodat de stijlen geladen worden -->
+    <!-- "./src/style.css" = ga in de map "src" zoeken naar het bestand "style.css" -->
   </head>
+
   <body>
-    <!-- id="app" is het hoofdelement, CSS en JavaScript zoeken dit element op -->
+    <!-- <body> bevat alles wat de gebruiker ziet op de pagina -->
+
     <div id="app">
-      <!-- LINKERKANT: Bestand kiezen & Acties -->
+      <!-- Hoofd-container van de hele applicatie -->
+      <!-- id="app" zodat we dit element kunnen stijlen of vinden in JavaScript -->
+
+      <!-- ═══ LINKERKANT: Bestand kiezen & Acties ═══════════════════════════ -->
       <aside class="controls-left">
+        <!-- <aside> = zijbalk element, links op het scherm -->
+        <!-- class="controls-left" = CSS klasse voor het uiterlijk -->
+
         <h1>Mijn Foto App</h1>
+        <!-- Grote hoofdtitel bovenaan de linkerzijbalk -->
 
         <div class="input-group">
+          <!-- Een wrapper div om de upload-knop en label samen te houden -->
+
           <label>Nieuwe Foto</label>
-          <!-- type="file" opent de bestandskiezer van het toestel -->
-          <!-- accept="image/*" filtert zodat de gebruiker alleen afbeeldingen kan kiezen -->
-          <!-- display:none verbergt dit input veld, de knop hieronder activeert het via JavaScript -->
+          <!-- Een label (tekst) boven de uploadknop -->
+
           <input
             type="file"
             id="file-input"
             accept="image/*"
             style="display: none"
           />
-          <!-- id="upload-trigger" wordt door main.js gebruikt om de verborgen file input te activeren -->
+          <!-- type="file" = dit is een bestandskiezer input -->
+          <!-- id="file-input" = we gebruiken dit id in main.js om het element te vinden -->
+          <!-- accept="image/*" = de gebruiker mag alleen afbeeldingen kiezen (jpg, png...) -->
+          <!-- style="display: none" = dit element is ONZICHTBAAR op de pagina -->
+          <!-- We tonen het niet, maar klikken er programmatisch op via JavaScript -->
+
           <button id="upload-trigger" class="upload-btn">
             📂 Kies van laptop
           </button>
+          <!-- De zichtbare uploadknop die de gebruiker ziet -->
+          <!-- id="upload-trigger" = in main.js luisteren we naar klikken op dit element -->
+          <!-- Als hierop geklikt wordt, simuleert JavaScript een klik op het verborgen file-input -->
         </div>
 
-        <!-- visuele scheiding tussen de upload en download knop -->
         <div style="margin: 20px 0; border-top: 1px solid #7dd3fc"></div>
+        <!-- Een horizontale scheidingslijn tussen de uploadknop en downloadknop -->
 
-        <!-- id="download-btn" wordt door main.js herkend om de download te starten -->
         <button id="download-btn" class="download-btn">
           📥 Download Bewerkt
         </button>
+        <!-- De downloadknop om de bewerkte foto op te slaan -->
+        <!-- id="download-btn" = in main.js luisteren we naar klikken op dit element -->
       </aside>
 
-      <!-- MIDDEN: De Foto Preview -->
-      <!-- id="foto-container" wordt door FotoManager.js gebruikt om foto's dynamisch in te plaatsen -->
+      <!-- ═══ MIDDEN: De Foto Preview ════════════════════════════════════════ -->
       <section id="foto-container" class="foto-sectie">
-        <!-- placeholder tekst die zichtbaar is zolang er nog geen foto geladen is -->
+        <!-- <section> = een inhoudelijk onderdeel van de pagina -->
+        <!-- id="foto-container" = BELANGRIJK: FotoManager.js zoekt dit element op -->
+        <!-- en plaatst hier de foto's in via JavaScript -->
+
         <div class="placeholder-text">
           <p>Klik op "Kies van laptop" om een foto te bewerken...</p>
+          <!-- Deze tekst zie je vóór er een foto geladen is -->
+          <!-- Zodra een foto geladen is, wordt deze div vervangen door de foto -->
         </div>
       </section>
 
-      <!-- RECHTERKANT: Filters -->
+      <!-- ═══ RECHTERKANT: Filters ═══════════════════════════════════════════ -->
       <aside class="controls-right">
+        <!-- Rechter zijbalk met de filteropties -->
+
         <h2>Filters</h2>
-        <!-- data-filter is een custom attribuut dat door main.js wordt uitgelezen bij een klik -->
-        <!-- de waarde (bv. "f-grayscale") wordt als CSS klasse op de foto gezet -->
+        <!-- Ondertitel voor de filterknopjes -->
+
         <button class="filter-btn" data-filter="f-grayscale">Zwart-wit</button>
+        <!-- data-filter="f-grayscale" = een custom data-attribuut -->
+        <!-- In main.js lezen we dit attribuut uit via getAttribute("data-filter") -->
+        <!-- "f-grayscale" is ook de naam van een CSS klasse in style.css -->
+
         <button class="filter-btn" data-filter="f-sepia">Sepia</button>
+        <!-- data-filter="f-sepia" = past een sepia (bruinachtig) CSS filter toe -->
+
         <button class="filter-btn" data-filter="f-invert">Invert</button>
-        <!-- data-filter="" betekent geen filter, filter-active staat hier standaard aan -->
+        <!-- data-filter="f-invert" = inverteert de kleuren van de foto -->
+
         <button class="filter-btn filter-active" data-filter="">Geen</button>
+        <!-- data-filter="" = lege string = geen filter -->
+        <!-- filter-active = deze klasse is standaard actief (geen filter geselecteerd) -->
 
         <p class="helper-text">
           Kies een filter en klik daarna op downloaden om de bewerkte foto op te
           slaan.
         </p>
+        <!-- Uitleg voor de gebruiker wat ze moeten doen -->
       </aside>
     </div>
 
-    <!-- type="module" is nodig omdat main.js import/export gebruikt -->
-    <!-- zonder type="module" begrijpt de browser de import statements niet -->
     <script type="module" src="./src/main.js"></script>
+    <!-- Dit laadt ons hoofd-JavaScript bestand ONDERAAN de pagina -->
+    <!-- type="module" = dit is een ES module, zodat we import/export kunnen gebruiken -->
+    <!-- Staat onderaan zodat alle HTML elementen al bestaan als het script start -->
   </body>
 </html>

@@ -1,168 +1,254 @@
-// main.js is het startpunt van de frontend
-// Hier worden alle modules samengebracht en events afgehandeld
+// ════════════════════════════════════════════════════════════════════════════
+// main.js — Het startpunt van de frontend applicatie
+// Dit is het eerste JavaScript bestand dat de browser uitvoert.
+// Het brengt alle onderdelen samen: de API, de FotoManager, en de events.
+// ════════════════════════════════════════════════════════════════════════════
 
-// Importeer de Api klasse uit de api module
+// ─── Imports ────────────────────────────────────────────────────────────────
+
 import { Api } from "./module/api.js";
+// We importeren de klasse "Api" uit het bestand api.js
+// Api bevat alle code om met de backend (server.js) te communiceren via fetch
 
-// Importeer de FotoManager klasse uit de FotoManager module
 import { FotoManager } from "./module/FotoManager.js";
+// We importeren de klasse "FotoManager" uit FotoManager.js
+// FotoManager beheert de lijst van foto's en toont ze op de pagina
 
-// Maak een instantie van Api aan om te communiceren met de backend
-// new Api() maakt een object aan zodat we getFotos() en postFoto() kunnen gebruiken
+// ─── Instanties aanmaken ────────────────────────────────────────────────────
+
 const api = new Api();
+// Maak één Api-object aan. Dit object gebruiken we later om
+// getFotos() en postFoto() op aan te roepen.
 
-// Maak een instantie van FotoManager aan, gekoppeld aan het HTML element met id "foto-container"
-// new FotoManager() zoekt het container element op en houdt de fotolijst bij
 const manager = new FotoManager("foto-container");
+// Maak één FotoManager-object aan.
+// "foto-container" = het id van het HTML element waar de foto's in komen
+// (zie index.html: <section id="foto-container">)
 
-// Observer pattern: registreer een functie die uitgevoerd wordt telkens de fotolijst verandert
-// subscribe() slaat deze functie op zodat notify() hem later automatisch kan oproepen
-// Elke keer als manager.setFotos() wordt aangeroepen, tekent dit automatisch de lijst opnieuw
+// ─── Observer pattern ───────────────────────────────────────────────────────
+
 manager.subscribe((fotos) => {
+  // subscribe() zegt: "als de fotolijst verandert, voer dan deze functie uit"
+  // Dit is het observer pattern: manager verwittigt ons automatisch bij elke update
+
   manager.tekenLijst(fotos);
+  // tekenLijst() verwijdert de oude foto's en toont de nieuwe lijst op de pagina
 });
 
-// Haal de HTML elementen op die we nodig hebben voor events
-const fileInput = document.getElementById("file-input"); // het verborgen bestandskiezer inputveld
-const uploadTrigger = document.getElementById("upload-trigger"); // de zichtbare uploadknop
-const downloadBtn = document.getElementById("download-btn"); // de downloadknop
+// ─── HTML elementen ophalen ─────────────────────────────────────────────────
 
-// ─── App opstarten ─────────────────────────────────────────────────────────────
+const fileInput = document.getElementById("file-input");
+// Haal het VERBORGEN bestandskiezer-inputveld op via zijn id
+// (zie index.html: <input type="file" id="file-input" style="display:none">)
 
-// async betekent dat de functie mag wachten op fetch zonder de pagina te blokkeren
-// zonder async/await zou manager.setFotos() een lege waarde krijgen want de data is nog niet binnen
+const uploadTrigger = document.getElementById("upload-trigger");
+// Haal de zichtbare uploadknop op via zijn id
+// (zie index.html: <button id="upload-trigger">)
+
+const downloadBtn = document.getElementById("download-btn");
+// Haal de downloadknop op via zijn id
+// (zie index.html: <button id="download-btn">)
+
+// ════════════════════════════════════════════════════════════════════════════
+// App opstarten
+// ════════════════════════════════════════════════════════════════════════════
+
 async function initApp() {
-  // await wacht hier totdat de server antwoordt voor we verdergaan
-  // zonder await zou fotos een Promise zijn in plaats van de echte data
-  const fotos = await api.getFotos();
+  // "async" = deze functie bevat code die moet wachten (async = asynchronous)
+  // Zonder async/await zou de pagina bevriezen terwijl we wachten op de server
 
-  // stel de lijst in, dit triggert automatisch tekenLijst() via het observer pattern
+  const fotos = await api.getFotos();
+  // "await" = wacht hier tot de server geantwoord heeft
+  // api.getFotos() stuurt een GET request naar http://localhost:3000/api/fotos
+  // het resultaat (een array van foto-objecten) wordt opgeslagen in "fotos"
+
   manager.setFotos(fotos);
+  // Geef de opgehaalde foto's aan de manager.
+  // setFotos() slaat de lijst op EN roept notify() aan
+  // notify() verwittigt onze subscriber → tekenLijst() wordt uitgevoerd
+  // → de foto's verschijnen op de pagina
 }
 
-// roep initApp aan zodat de foto's meteen geladen worden bij page-load
 initApp();
+// Roep initApp() onmiddellijk aan zodra de pagina geladen is.
+// Dit is het startschot: de app haalt de foto's op en toont ze.
 
-// ─── Upload knop ───────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// Event: Klik op de uploadknop
+// ════════════════════════════════════════════════════════════════════════════
 
-// klik op de zichtbare knop → activeer het verborgen file input element
-// we verbergen het echte input veld omdat het er lelijk uitziet in de browser
 if (uploadTrigger) {
+  // Controleer eerst of het element bestaat (veiligheidscheck)
+
   uploadTrigger.addEventListener("click", () => {
-    // programmatisch klikken op het verborgen file input zodat de file picker opent
+    // "click" = luister naar muisklikken op uploadTrigger
+
     fileInput.click();
+    // Simuleer programmatisch een klik op het VERBORGEN file-input element
+    // Dit opent het venster waarmee de gebruiker een bestand kan kiezen
+    // We doen dit via JavaScript omdat we het file-input element zelf verborgen hebben
   });
 }
 
-// ─── Bestand kiezen ────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// Event: Gebruiker kiest een bestand
+// ════════════════════════════════════════════════════════════════════════════
 
-// wordt uitgevoerd wanneer de gebruiker een bestand kiest via de file picker
 if (fileInput) {
+  // Controleer of het element bestaat
+
   fileInput.addEventListener("change", (e) => {
-    // files[0] omdat de index bij 0 begint, we nemen het eerste gekozen bestand
+    // "change" = dit event vuurt af zodra de gebruiker een bestand gekozen heeft
+    // "e" = het event object, bevat info over wat er is gebeurd
+
     const file = e.target.files[0];
+    // e.target = het file-input element zelf
+    // .files = een lijst van gekozen bestanden
+    // [0] = we nemen het eerste (en enige) bestand
 
-    // stop als er geen bestand gekozen is, zo crasht de rest van de code niet
     if (!file) return;
+    // Als de gebruiker het venster sluit zonder een bestand te kiezen,
+    // is "file" leeg. Dan stoppen we hier.
 
-    // FileReader kan een bestand inlezen als base64 tekst
-    // we hebben base64 nodig omdat fetch geen raw bestanden kan versturen
     const reader = new FileReader();
+    // FileReader is een ingebouwde browser API om bestanden in te lezen
+    // We gebruiken het om de afbeelding om te zetten naar base64 tekst
 
-    // onload wordt uitgevoerd wanneer het bestand volledig ingelezen is
     reader.onload = async (event) => {
-      // event.target.result bevat de volledige base64 string van de afbeelding
+      // onload wordt uitgevoerd wanneer het inlezen KLAAR is (async!)
+      // "event" bevat het resultaat van het inlezen
+
       const afbeeldingData = event.target.result;
+      // event.target.result = de afbeelding als base64 string
+      // Voorbeeld: "data:image/jpeg;base64,/9j/4AAQSkZJRgAB..."
 
-      // maak een foto-object met naam en base64 url
       const nieuweFoto = {
-        naam: file.name,
-        url: afbeeldingData,
+        naam: file.name, // de bestandsnaam, bv. "vakantie.jpg"
+        url: afbeeldingData, // de base64 data van de afbeelding
       };
+      // Maak een foto-object aan met naam en url eigenschappen
 
-      // stuur de foto naar de backend via POST
       await api.postFoto(nieuweFoto);
+      // Stuur de nieuwe foto via POST naar de backend (server.js)
+      // await = wacht tot de server bevestigt dat het ontvangen is
 
-      // spread operator: maak een nieuwe array met alle bestaande foto's + de nieuwe erbij
-      // we gebruiken spread zodat we de originele array niet rechtstreeks aanpassen
       const nieuweLijst = [...manager.fotos, nieuweFoto];
+      // Spread operator "..." = kopieer alle bestaande foto's in een nieuwe array
+      // dan voegen we nieuweFoto toe achteraan
+      // Resultaat: nieuwe array = alle oude foto's + de nieuwe foto
 
-      // setFotos() slaat de nieuwe lijst op en triggert automatisch tekenLijst() via observer
       manager.setFotos(nieuweLijst);
+      // Update de manager met de nieuwe lijst
+      // Dit triggert automatisch tekenLijst() via de observer
+      // → de nieuwe foto verschijnt onmiddellijk op de pagina
     };
 
-    // start het inlezen van het bestand, resultaat komt terug in onload hierboven
     reader.readAsDataURL(file);
+    // Start het inlezen van het bestand als een base64 data URL
+    // Wanneer dit klaar is, wordt reader.onload automatisch aangeroepen
   });
 }
 
-// ─── Filter knoppen ────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// Event: Filter knoppen
+// ════════════════════════════════════════════════════════════════════════════
 
-// querySelectorAll geeft alle knoppen met klasse "filter-btn" terug
-// forEach loopt door elke knop zodat we niet voor elke knop apart code moeten schrijven
 document.querySelectorAll(".filter-btn").forEach((btn) => {
+  // querySelectorAll(".filter-btn") = zoek ALLE elementen met klasse "filter-btn"
+  // forEach = voor elke gevonden knop, voer de volgende code uit
+
   btn.addEventListener("click", (e) => {
-    // lees het data-filter attribuut van de geklikte knop (bv. "f-grayscale")
+    // Luister naar klikken op elke filterknop
+
     const filter = e.target.getAttribute("data-filter");
+    // Lees het data-filter attribuut van de geklitte knop
+    // bv. data-filter="f-grayscale" → filter = "f-grayscale"
+    // bv. data-filter="" → filter = "" (geen filter)
 
-    // verwijder de actieve klasse van alle knoppen zodat er maar één actief is
-    document
-      .querySelectorAll(".filter-btn")
-      .forEach((b) => b.classList.remove("filter-active"));
+    document.querySelectorAll(".filter-btn").forEach((b) => {
+      b.classList.remove("filter-active");
+    });
+    // Loop over ALLE filterknoppen en verwijder de "filter-active" klasse van elk
+    // Dit "reset" de actieve staat van alle knoppen
 
-    // zet de actieve klasse op de knop die net geklikt werd
     e.target.classList.add("filter-active");
+    // Voeg "filter-active" toe aan ALLEEN de knop waarop geklikt is
+    // Dit markeert visueel welk filter actief is
 
-    // zoek het foto element op de pagina
     const img = document.querySelector(".foto-card img");
+    // Zoek het foto-element op de pagina
+    // ".foto-card img" = de <img> tag die binnen een element met klasse "foto-card" staat
 
     if (img) {
-      // verwijder alle vorige filter klassen van de afbeelding
-      img.className = "";
+      // Controleer of er al een foto op de pagina is
 
-      // voeg het nieuwe filter toe als CSS klasse op de afbeelding
+      img.className = "";
+      // Verwijder ALLE CSS klassen van de afbeelding
+      // Dit verwijdert ook het vorige filter
+
       if (filter) {
+        // Als er een filter gekozen is (niet de lege string "")
+
         img.classList.add(filter);
+        // Voeg de filter-klasse toe aan de afbeelding
+        // bv. img.classList.add("f-grayscale")
+        // In style.css is .f-grayscale gedefinieerd als filter: grayscale(100%)
       }
     }
   });
 });
 
-// ─── Download knop ─────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// Event: Download knop
+// ════════════════════════════════════════════════════════════════════════════
 
 if (downloadBtn) {
-  downloadBtn.addEventListener("click", () => {
-    const img = document.querySelector(".foto-card img");
+  // Controleer of het element bestaat
 
-    // stop als er nog geen foto is en toon een melding aan de gebruiker
+  downloadBtn.addEventListener("click", () => {
+    // Luister naar klikken op de downloadknop
+
+    const img = document.querySelector(".foto-card img");
+    // Zoek de foto op de pagina
+
     if (!img) {
       return alert("Upload eerst een foto");
+      // Als er nog geen foto is, toon een melding en stop
     }
 
-    // canvas gebruiken omdat CSS filters de echte pixels niet aanpassen
-    // op canvas branden we het filter er echt op zodat de download het filter bevat
     const canvas = document.createElement("canvas");
-    // "2d" betekent we werken in twee dimensies
-    const ctx = canvas.getContext("2d");
+    // Maak een nieuw <canvas> element aan in JavaScript (niet zichtbaar op de pagina)
+    // Canvas = een "tekenvlak" waarop je pixels kan manipuleren
 
-    // naturalWidth/naturalHeight is de echte pixelgrootte, niet de weergavegrootte op het scherm
+    const ctx = canvas.getContext("2d");
+    // Haal de 2D tekencontext op van de canvas
+    // ctx is het object waarmee je dingen KAN tekenen op de canvas
+
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
+    // Stel de canvas in op de ECHTE pixels van de originele afbeelding
+    // naturalWidth/Height = de werkelijke grootte, niet de weergavegrootte
 
-    // lees het CSS filter van de afbeelding uit (bv. "grayscale(100%)")
-    // en pas dat filter toe op de canvas context zodat de pixels echt veranderen
     ctx.filter = getComputedStyle(img).filter;
+    // Lees het huidige CSS filter van de afbeelding (bv. "grayscale(100%)")
+    // en pas hetzelfde filter toe op de canvas
+    // Zo bevat de gedownloade foto ook het gekozen filter
 
-    // teken de afbeelding op de canvas met het filter erop
     ctx.drawImage(img, 0, 0);
+    // Teken de afbeelding op de canvas, startend op positie (0,0)
+    // Het filter wordt automatisch mee toegepast
 
-    // maak een tijdelijke download link aan
     const link = document.createElement("a");
-    // stel de bestandsnaam in voor de download
+    // Maak een onzichtbare <a> (link) aan in JavaScript
+
     link.download = "foto.png";
-    // toDataURL() zet de canvas pixels om naar een downloadbare URL
+    // Stel de bestandsnaam in die gebruikt wordt bij het downloaden
+
     link.href = canvas.toDataURL();
-    // klik automatisch op de link zodat de download start
+    // Zet de volledige canvas (met filter) om naar een downloadbare URL
+    // canvas.toDataURL() → "data:image/png;base64,..."
+
     link.click();
+    // Simuleer een klik op de link → de browser start de download
   });
 }
